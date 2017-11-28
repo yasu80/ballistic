@@ -1,0 +1,104 @@
+    Dim m, d, u, wing_s, cl, cd, theta_launch As Double  ' Input_Param:missile_data as mass, nozzle diameter, jet_vel, wing_cl. wing_cd, launch_angle.
+    Dim t, missile_x, missile_y, velo, theta_wind As Double ' Calc_Param: time, x, y, v, windAngle, buffer.
+    Dim resolution_t, selfDistrunct As Double  ' Calc_setting_param : how resolute calcuration of Integral
+    
+    
+    ' now v0 is 0
+    
+    
+    
+    Function getThrot(d, u, m, resolution_t)
+        Dim throt As Double
+        throt = d * u * m * resolution_t
+        getThrot = throt
+    End Function
+        
+    Function getLift(velo, cl, wing_s)
+        lo = 1.293
+        Dim lift As Double
+        lift = ((v ^ 2) * wing_s * cl) / 2
+        getLift = lift
+    End Function
+    
+    Function getDrag(velo, cd, wing_s)
+        lo = 1.293
+        Dim drag As Double
+        drag = ((v ^ 2) * wing_s * cd) / 2
+        getDrag = drag
+    End Function
+         
+    Function getGrav(m, g)
+        Dim grav As Double
+        g = 9.8
+        grav = m * g
+        getGrav = grav
+    End Function
+    
+    Function getWindAngle(m, wing_s, cl, theta_wind, velo) 'there, a = tan(a) =sin(a)
+        Dim delta_theta As Double
+        delta_theta = getLift(velo, cl, wing_s) - (getGrav(m, g)) * Cos((Pi / 180) * theta_wind)
+        theta_wind = theta_wind + delta_theta
+        getWindAngle = theta_wind
+    End Function
+    
+    Function getVelo(m, d, u, wing_s, cl, cd, theta_launch)
+        Dim delta_velo As Double
+        m = 2
+        delta_velo = (getThrot(d, u, m, resolution_t) - getDrag(velo, cd, wing_s)) / m
+        velo = velo + delta_velo
+        getVelo = velo
+    End Function
+    
+    Function getxPos()
+        Dim delta_x As Double
+        delta_x = (getVelo(m, d, u, wing_s, cl, cd, theta_wind)) * Cos((Pi / 180) * getWindAngle(m, wing_s, cl, theta_wind, velo)) * resolution_t
+        missile_x = missile_x + delta_x
+        getxPos = delta_x
+        
+    End Function
+        
+    Function getyPos()
+        Dim delta_y As Double
+        delta_y = (getVelo(m, d, u, wing_s, cl, cd, theta_wind)) * Sin((Pi / 180) * getWindAngle(m, wing_s, cl, theta_wind, velo)) * resolution_t
+        missile_y = missile_y + delta_y
+        getyPos = deltay
+        
+    End Function
+    Function ifTerm(y)
+    Dim impact As Boolean
+        impact = False
+        If y < 0 Then
+            impact = True
+        End If
+        If t > selfDistrunct Then
+            impact = True
+        End If
+        ifTerm = impact
+    End Function
+Sub balistic_missile()
+
+    
+    m = Cells(2, 2)
+    d = Cells(2, 3)
+    u = Cells(2, 4)
+    wing_s = Cells(2, 5)
+    cl = Cells(2, 6)
+    cd = Cells(2, 7)
+    theta_launch = Cells(2, 8)
+    resolution_t = Cells(2, 9)
+    
+    Do
+        x = getxPos()
+        y = getyPos()
+        t = t + resolution_t
+    Loop Until ifTerm(y) = True
+    
+    Cells(3, 2) = missile_x
+    Cells(3, 3) = missile_y
+    Cells(3, 4) = velo
+    Cells(3, 5) = theta_wind
+    missile_x = missile_y = velo = theta_wind = 0
+    
+    
+End Sub
+
