@@ -43,7 +43,7 @@
     
     Function getVelo(m, d, u, wing_s, cl, cd, theta_launch)
         Dim delta_velo As Double
-        m = 2
+        m = 2  ` should be a garbage of test code, no need
         delta_velo = (getThrot(d, u, m, resolution_t) - getDrag(velo, cd, wing_s)) / m
         velo = velo + delta_velo
         getVelo = velo
